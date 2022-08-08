@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+ini_set('date.timezone', 'Europe/Brussels');
+
 if ('application/json' !== $_SERVER['CONTENT_TYPE']) {
     header('Content-Type: application/json', true, 400);
     echo '{"error": "Only JSON requests are allowed, please try again."}';
@@ -26,6 +28,17 @@ if ('GET' === $request->method && '' === $request->route) {
         return;
     }
     echo '{"message":"Hello World!"}';
+    return;
+}
+
+if ('GET' === $request->method && '/ping' === $request->route) {
+    echo json_encode(['message' => 'PONG']);
+    return;
+}
+
+if ('GET' === $request->method && '/status' === $request->route) {
+    header('X-Status-Date: ' . date('r'));
+    header('Content-Type: application/json', true, 204);
     return;
 }
 
