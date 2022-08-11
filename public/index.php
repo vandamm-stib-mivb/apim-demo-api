@@ -2,54 +2,66 @@
 
 declare(strict_types=1);
 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Slim\Factory\AppFactory;
+
 ini_set('date.timezone', 'Europe/Brussels');
 
-if ('application/json' !== $_SERVER['CONTENT_TYPE']) {
-    header('Content-Type: application/json', true, 400);
-    echo '{"error": "Only JSON requests are allowed, please try again."}';
-    return;
+$filename = __DIR__.preg_replace('#(\?.*)$#', '', $_SERVER['REQUEST_URI']);
+if (php_sapi_name() === 'cli-server' && is_file($filename)) {
+    return false;
 }
 
-$queryParams = [];
-if (isset ($_SERVER['QUERY_STRING'])) {
-    parse_str($_SERVER['QUERY_STRING'], $queryParams);
-}
-$request = new StdClass();
-$request->method = $_SERVER['REQUEST_METHOD'];
-$request->body = json_decode(file_get_contents('php://input'), true);
-$request->route = rtrim($_SERVER['PATH_INFO'] ?? '/', '/');
-$request->query = $queryParams;
+require_once __DIR__ . '/../vendor/autoload.php';
 
-header('Content-Type: application/json');
+define('DEFAULT_CONTENT_TYPE', 'application/json');
 
-if ('GET' === $request->method && '' === $request->route) {
-    if (isset ($request->body['name'])) {
-        echo '{"message":"Hello ' . $request->body['name'] . '!"}';
-        return;
+$app = AppFactory::create();
+$app->addRoutingMiddleware();
+
+$jsonMiddleware = function (Request $request, RequestHandler $handler) {
+    $response = $handler->handle($request);
+    return $response->withHeader('Content-Type', DEFAULT_CONTENT_TYPE);
+};
+
+$app->add($jsonMiddleware);
+
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+$errorHandler = $errorMiddleware->getDefaultErrorHandler();
+$errorHandler->forceContentType(DEFAULT_CONTENT_TYPE);
+
+$app->get('/', function (Request $request, Response $response): Response {
+    $requestData = json_decode($request->getBody()->getContents(), true);
+    $message = sprintf('Hello %s!', $requestData['name'] ?? 'World');
+    $payload = json_encode(['message' => $message]);
+    $response->getBody()->write($payload);
+    return $response;
+});
+
+$app->get('/ping', function (Request $request, Response $response): Response {
+    if (null !== $request) {
+        unset($request);
     }
-    echo '{"message":"Hello World!"}';
-    return;
-}
+    $payload = json_encode(['message' => 'pong']);
+    $response->getBody()->write($payload);
+    return $response;
+});
 
-if ('GET' === $request->method && '/ping' === $request->route) {
-    echo json_encode(['message' => 'PONG']);
-    return;
-}
-
-if ('GET' === $request->method && '/status' === $request->route) {
-    header('X-Status-Date: ' . date('r'));
-    header('Content-Type: application/json', true, 204);
-    return;
-}
-
-if ('GET === $request->method' && '/foobar' === $request->route) {
-    echo json_encode([
-        'message' => 'When things go to pieces, this is often called FOOBAR',
+$app->get('/status', function (Request $request, Response $response): Response {
+    if (null !== $request) {
+        $request = null;
+    }
+    $payload = json_encode([
+        'status' => [
+            'memory' => memory_get_usage(true),
+            'free_disk_space' => disk_free_space('.'),
+            'errors' => 0,
+        ],
     ]);
-    return;
-}
+    $response->getBody()->write($payload);
+    return $response;
+});
 
-header('Content-Type: application/json', true, 404);
-echo json_encode([
-    'error' => sprintf('%s Not Found', $request->route),
-]);
+$app->run();

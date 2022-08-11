@@ -1,0 +1,109 @@
+### Get a world greeting from the API
+GET {{ baseUri }}
+Accept: application/json
+
+> {%
+ client.test("Receive world greeting", function () {
+     client.assert(response.status === 200, "Expected a 200 OK response");
+     client.assert(response.contentType.mimeType === "application/json", "Expecting JSON Response");
+     client.assert(response.body.message === "Hello World!", "Expected a world greeting");
+ });
+ %}
+
+<> 2022-08-11T183239.200.json
+<> 2022-08-11T183114.200.json
+<> 2022-08-11T183029.200.json
+<> 2022-08-11T182940.200.json
+<> 2022-08-11T182853.200.json
+<> 2022-08-11T182637.200.json
+<> 2022-08-11T182511.200.json
+<> 2022-08-11T182252.200.json
+<> 2022-08-11T182111.200.json
+
+### Get a personal greeting from the API
+GET {{ baseUri }}
+Content-Type: application/json
+
+{"name": "Michelangelo"}
+
+> {%
+ client.test("Receive personal greeting", function () {
+     client.assert(response.status === 200, "Expected a 200 OK response");
+     client.assert(response.contentType.mimeType === "application/json", "Expecting JSON Response");
+     client.assert(response.body.message === "Hello Michelangelo!", "Expected a personal greeting");
+ });
+ %}
+
+<> 2022-08-11T183240.200.json
+<> 2022-08-11T183115.200.json
+<> 2022-08-11T183029-1.200.json
+<> 2022-08-11T182940-1.200.json
+<> 2022-08-11T182853-1.200.json
+<> 2022-08-11T182637-1.200.json
+<> 2022-08-11T182511-1.200.json
+<> 2022-08-11T182252-1.200.json
+<> 2022-08-11T182111-1.200.json
+
+### Play ping-pong with the API
+GET {{ baseUri }}/ping
+
+> {%
+ client.test("Playing ping-pong", function () {
+     client.assert(response.status === 200, "Expected a 200 OK response");
+     client.assert(response.contentType.mimeType === "application/json", "Expecting JSON Response");
+     client.assert(response.body.message === "pong", "Expected a pong as response");
+ });
+ %}
+
+<> 2022-08-11T183240-1.200.json
+<> 2022-08-11T183115-1.200.json
+<> 2022-08-11T183029-2.200.json
+<> 2022-08-11T182940-2.200.json
+<> 2022-08-11T182853-2.200.json
+<> 2022-08-11T182637-2.200.json
+<> 2022-08-11T182511-2.200.json
+<> 2022-08-11T182252-2.200.json
+<> 2022-08-11T182111-2.200.json
+
+### Get the status of the API
+GET {{ baseUri }}/status
+
+> {%
+ client.test("Get the status of the API", function () {
+     client.assert(response.status === 200, "Expected a 200 OK response");
+     client.assert(response.contentType.mimeType === "application/json", "Expecting JSON Response");
+     client.assert(response.body.status.memory >= 0, "Expecting to have some memory left");
+     client.assert(response.body.status.free_disk_space >= 0, "Expecting to have some disk space left");
+     client.assert(response.body.status.errors === 0, "Expecting to have no errors");
+ });
+ %}
+
+<> 2022-08-11T183240-2.200.json
+<> 2022-08-11T183115-2.200.json
+<> 2022-08-11T183029-3.200.json
+<> 2022-08-11T182940-3.200.json
+<> 2022-08-11T182853-3.200.json
+<> 2022-08-11T182637-3.200.json
+<> 2022-08-11T182511-3.200.json
+<> 2022-08-11T182252-3.200.json
+<> 2022-08-11T182111-3.200.json
+
+### Ask for a non-existing endpoint
+GET {{ baseUri }}/foo
+
+> {%
+ client.test("Find the missing link", function () {
+     client.assert(response.status === 404, "Expected a 404 Not Found response");
+     client.assert(response.contentType.mimeType === "application/json", "Expecting JSON Response");
+     client.assert(response.body.message === "404 Not Found", "Expecting that the file was not found");
+ });
+ %}
+<> 2022-08-11T183240.404.json
+<> 2022-08-11T183115.404.json
+<> 2022-08-11T183029.404.json
+<> 2022-08-11T182940.404.json
+<> 2022-08-11T182853.404.json
+<> 2022-08-11T182637.404.json
+<> 2022-08-11T182511.404.json
+<> 2022-08-11T182252.404.json
+<> 2022-08-11T182111.404.json
