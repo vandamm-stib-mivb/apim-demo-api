@@ -1,0 +1,217 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Azure API Management Demo API",
+    "description": "This project is a very basic API application build with PHP that will be used as a demo to learn more about [Azure APIOps] and how the process could be implemented.",
+    "version": "1.0.0",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://as-apim-apiops.azurewebsites.net",
+      "description": "The public demo API service"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "The entry point of the API service",
+        "responses": {
+          "200": {
+            "description": "A personal message from the API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloName"
+                },
+                "examples": {
+                  "message": {
+                    "summary": "A personal message to Robin from the API",
+                    "value": "Hello Robin!"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "A welcome message to the world",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloWorld"
+                },
+                "examples": {
+                  "message": {
+                    "summary": "A welcome message to the world from the API",
+                    "value": "Hello World!"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "description": "The health-check endpoint of the API",
+        "responses": {
+          "200": {
+            "description": "A game of ping-pong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingPong"
+                },
+                "examples": {
+                  "message": {
+                    "summary": "A return message to say everything is OK",
+                    "value": "pong"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "description": "The status endpoint of the API",
+        "responses": {
+          "200": {
+            "description": "Getting more details from the API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiStatus"
+                },
+                "examples": {
+                  "status": {
+                    "summary": "The status of the API in a nutshell",
+                    "value": "{\"memory\":500000,\"free_disk_space\":9996663330000,\"errors\":0}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HelloWorld": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "HelloName": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "PingPong": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "StatusDetails": {
+        "type": "object",
+        "required": [
+          "memory",
+          "free_disk_space",
+          "errors"
+        ],
+        "properties": {
+          "memory": {
+            "type": "integer"
+          },
+          "free_disk_space": {
+            "type": "integer"
+          },
+          "errors": {
+            "type": "integer"
+          }
+        }
+      },
+      "ApiStatus": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/StatusDetails"
+          }
+        }
+      },
+      "NotFoundException": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          }
+        }
+      },
+      "NotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "exception": {
+            "$ref": "#/components/schemas/NotFoundException"
+          }
+        }
+      },
+      "UserName": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
