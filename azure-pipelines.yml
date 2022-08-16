@@ -18,3 +18,19 @@ stages:
         steps:
           - bash: echo "Behat"
 
+  - stage: GetSourcesAndPublish
+    displayName: Get sources and publish
+    jobs:
+      - job: GetSources
+        displayName: Get Sources
+        steps:
+          - task: CopyFiles@2
+            displayName: Copy APIM Templates to staging directory
+            inputs:
+              sourceFolder: '$(Build.SourcesDirectory)/.apim-templates'
+              contents: '*.json'
+              targetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: apim-apis
