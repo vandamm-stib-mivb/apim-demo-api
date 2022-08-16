@@ -1,0 +1,20 @@
+---
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: TestApi
+    displayName: Test the API
+    jobs:
+      - job: UnitTesting
+        displayName: Run unit tests
+        steps:
+          - bash: echo "PHPUnit"
+      - job: AcceptanceTesting
+        displayName: Run behaviour tests
+        steps:
+          - bash: echo "Behat"
+
